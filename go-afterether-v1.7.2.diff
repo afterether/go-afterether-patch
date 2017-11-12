@@ -1,12 +1,12 @@
-diff -Naur go-ethereum-1.7.2/afterether-genesis.json go-afterether-1.7.2/afterether-genesis.json
+diff -Naur -x README.md go-ethereum-1.7.2/afterether-genesis.json go-afterether-1.7.2/afterether-genesis.json
 --- go-ethereum-1.7.2/afterether-genesis.json	1969-12-31 18:00:00.000000000 -0600
 +++ go-afterether-1.7.2/afterether-genesis.json	2017-10-22 11:21:35.028936949 -0500
 @@ -0,0 +1 @@
 +{"config":{"chainId":233},"difficulty":"2100","gasLimit":"2100000","alloc":{"da7962f26e426fa3b3a005a100e1683e8f733760":{"balance":"10000000000000000000000000"}}}
 \ No newline at end of file
-diff -Naur go-ethereum-1.7.2/consensus/ethash/consensus.go go-afterether-1.7.2/consensus/ethash/consensus.go
+diff -Naur -x README.md go-ethereum-1.7.2/consensus/ethash/consensus.go go-afterether-1.7.2/consensus/ethash/consensus.go
 --- go-ethereum-1.7.2/consensus/ethash/consensus.go	2017-10-14 07:58:53.000000000 -0500
-+++ go-afterether-1.7.2/consensus/ethash/consensus.go	2017-10-26 19:04:24.637861012 -0500
++++ go-afterether-1.7.2/consensus/ethash/consensus.go	2017-11-12 11:43:32.820502228 -0600
 @@ -37,7 +37,7 @@
  // Ethash proof-of-work protocol constants.
  var (
@@ -73,7 +73,28 @@ diff -Naur go-ethereum-1.7.2/consensus/ethash/consensus.go go-afterether-1.7.2/c
  // calcDifficultyByzantium is the difficulty adjustment algorithm. It returns
  // the difficulty that a new block should have when created at time given the
  // parent block's time and difficulty. The calculation uses the Byzantium rules.
-diff -Naur go-ethereum-1.7.2/eth/config.go go-afterether-1.7.2/eth/config.go
+@@ -521,6 +546,7 @@
+ var (
+ 	big8  = big.NewInt(8)
+ 	big32 = big.NewInt(32)
++	reward_block=big.NewInt(154865)
+ )
+ 
+ // AccumulateRewards credits the coinbase of the given block with the mining
+@@ -531,7 +557,11 @@
+ 	// Select the correct block reward based on chain progression
+ 	blockReward := frontierBlockReward
+ 	if config.IsByzantium(header.Number) {
+-		blockReward = byzantiumBlockReward
++		if (header.Number.Cmp(reward_block)>0) {
++			blockReward=big.NewInt(2e+18);
++		} else {
++			blockReward = byzantiumBlockReward
++		}
+ 	}
+ 	// Accumulate the rewards for the miner and any included uncles
+ 	reward := new(big.Int).Set(blockReward)
+diff -Naur -x README.md go-ethereum-1.7.2/eth/config.go go-afterether-1.7.2/eth/config.go
 --- go-ethereum-1.7.2/eth/config.go	2017-10-14 07:58:53.000000000 -0500
 +++ go-afterether-1.7.2/eth/config.go	2017-10-29 09:55:35.636928229 -0600
 @@ -39,7 +39,7 @@
@@ -85,7 +106,7 @@ diff -Naur go-ethereum-1.7.2/eth/config.go go-afterether-1.7.2/eth/config.go
  	LightPeers:           20,
  	DatabaseCache:        128,
  	GasPrice:             big.NewInt(18 * params.Shannon),
-diff -Naur go-ethereum-1.7.2/node/defaults.go go-afterether-1.7.2/node/defaults.go
+diff -Naur -x README.md go-ethereum-1.7.2/node/defaults.go go-afterether-1.7.2/node/defaults.go
 --- go-ethereum-1.7.2/node/defaults.go	2017-10-14 07:58:53.000000000 -0500
 +++ go-afterether-1.7.2/node/defaults.go	2017-10-22 11:21:15.871014987 -0500
 @@ -55,11 +55,11 @@
@@ -103,7 +124,7 @@ diff -Naur go-ethereum-1.7.2/node/defaults.go go-afterether-1.7.2/node/defaults.
  		}
  	}
  	// As we cannot guess a stable location, return empty and handle later
-diff -Naur go-ethereum-1.7.2/p2p/discover/udp.go go-afterether-1.7.2/p2p/discover/udp.go
+diff -Naur -x README.md go-ethereum-1.7.2/p2p/discover/udp.go go-afterether-1.7.2/p2p/discover/udp.go
 --- go-ethereum-1.7.2/p2p/discover/udp.go	2017-10-14 07:58:53.000000000 -0500
 +++ go-afterether-1.7.2/p2p/discover/udp.go	2017-10-23 15:44:30.351454448 -0500
 @@ -59,7 +59,7 @@
@@ -115,7 +136,7 @@ diff -Naur go-ethereum-1.7.2/p2p/discover/udp.go go-afterether-1.7.2/p2p/discove
  	pongPacket
  	findnodePacket
  	neighborsPacket
-diff -Naur go-ethereum-1.7.2/params/bootnodes.go go-afterether-1.7.2/params/bootnodes.go
+diff -Naur -x README.md go-ethereum-1.7.2/params/bootnodes.go go-afterether-1.7.2/params/bootnodes.go
 --- go-ethereum-1.7.2/params/bootnodes.go	2017-10-14 07:58:53.000000000 -0500
 +++ go-afterether-1.7.2/params/bootnodes.go	2017-10-22 11:21:15.871014987 -0500
 @@ -19,42 +19,27 @@
@@ -164,10 +185,10 @@ diff -Naur go-ethereum-1.7.2/params/bootnodes.go go-afterether-1.7.2/params/boot
 -	"enode://1c7a64d76c0334b0418c004af2f67c50e36a3be60b5e4790bdac0439d21603469a85fad36f2473c9a80eb043ae60936df905fa28f1ff614c3e5dc34f15dcd2dc@40.118.3.223:30308",
 -	"enode://85c85d7143ae8bb96924f2b54f1b3e70d8c4d367af305325d30a61385a432f247d2c75c45c6b4a60335060d072d7f5b35dd1d4c45f76941f62a4f83b6e75daaf@40.118.3.223:30309",
  }
-diff -Naur go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.go
+diff -Naur -x README.md go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.go
 --- go-ethereum-1.7.2/params/config.go	2017-10-14 07:58:53.000000000 -0500
-+++ go-afterether-1.7.2/params/config.go	2017-11-08 15:38:35.599031781 -0600
-@@ -19,27 +19,27 @@
++++ go-afterether-1.7.2/params/config.go	2017-11-12 11:10:19.174763069 -0600
+@@ -19,7 +19,7 @@
  import (
  	"fmt"
  	"math/big"
@@ -176,12 +197,7 @@ diff -Naur go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.
  	"github.com/ethereum/go-ethereum/common"
  )
  
- var (
--	MainnetGenesisHash = common.HexToHash("0xd4e56740f876aef8c010b86a40d5f56745a118d0906a34e69aec8c0db1cb8fa3") // Mainnet genesis hash to enforce below configs on
-+	MainnetGenesisHash = common.HexToHash("0x13771466fee63d1916818f25c5e2ed5e09330b9fccc8da760c172d09412680d4") // Mainnet genesis hash to enforce below configs on
- 	TestnetGenesisHash = common.HexToHash("0x41941023680923e0fe4d74a34bdac8141f2540e3ae90623718e47d66d1ca4a2d") // Testnet genesis hash to enforce below configs on
- )
- 
+@@ -31,15 +31,15 @@
  var (
  	// MainnetChainConfig is the chain parameters to run a node on the main network.
  	MainnetChainConfig = &ChainConfig{
@@ -199,7 +215,7 @@ diff -Naur go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.
 -		EIP155Block:    big.NewInt(2675000),
 -		EIP158Block:    big.NewInt(2675000),
 -		ByzantiumBlock: big.NewInt(4370000),
-+		EIP155Block:    big.NewInt(1),
++		EIP155Block:    big.NewInt(151075),
 +		EIP158Block:    big.NewInt(1),
 +		ByzantiumBlock: big.NewInt(1),
  
@@ -225,6 +241,15 @@ diff -Naur go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.
  
  		Ethash: new(EthashConfig),
  	}
+@@ -175,7 +175,7 @@
+ }
+ 
+ func (c *ChainConfig) IsEIP155(num *big.Int) bool {
+-	return isForked(c.EIP155Block, num)
++    return isForked(big.NewInt(151075), num)
+ }
+ 
+ func (c *ChainConfig) IsEIP158(num *big.Int) bool {
 @@ -183,7 +183,7 @@
  }
  
@@ -234,7 +259,7 @@ diff -Naur go-ethereum-1.7.2/params/config.go go-afterether-1.7.2/params/config.
  }
  
  // GasTable returns the gas table corresponding to the current phase (homestead or homestead reprice).
-diff -Naur go-ethereum-1.7.2/params/protocol_params.go go-afterether-1.7.2/params/protocol_params.go
+diff -Naur -x README.md go-ethereum-1.7.2/params/protocol_params.go go-afterether-1.7.2/params/protocol_params.go
 --- go-ethereum-1.7.2/params/protocol_params.go	2017-10-14 07:58:53.000000000 -0500
 +++ go-afterether-1.7.2/params/protocol_params.go	2017-10-22 11:21:15.871014987 -0500
 @@ -78,6 +78,6 @@

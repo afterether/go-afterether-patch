@@ -1,7 +1,5 @@
 # AfterEther cryptocurrency project
 
-AfterEther is a project to create a copy of Ether (ETH), the currency of Ethereum.
-
 http://afterether.org
 
 
